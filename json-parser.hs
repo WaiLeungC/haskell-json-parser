@@ -4,8 +4,14 @@ jsonWhitespace = " \t\b\n\r"
 jsonSyntax :: String
 jsonSyntax = ",:[]{}"
 
+lexString :: String -> Maybe (String, String)
+lexString ('"' : xs) = Just (takeWhile (/= '"') xs, '"' : xs)
+lexString _ = Nothing
+
 lex' :: String -> [String]
 lex' [] = []
+lex' ('"' : xs) = case lexString ('"' : xs) of
+  Nothing -> error "Invalid string"
 lex' (x : xs)
   | x `elem` jsonWhitespace = lex' xs
   | x `elem` jsonSyntax = [x] : lex' xs
@@ -13,4 +19,6 @@ lex' (x : xs)
 
 main :: IO ()
 main = do
-  print (lex' "{ : [ , , { : }]}")
+  print (lexString "\"foo\": []")
+
+-- print (lex' "{\"foo\": [ , , {\"bar\": }]}")
