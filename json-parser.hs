@@ -6,7 +6,7 @@ jsonSyntax = ",:[]{}"
 
 lexString :: String -> (String, String)
 lexString ('"' : xs) =
-  let (string, rest) = span (/= '"') xs
+  let (string, rest) = break (== '"') xs
    in (string, drop 1 rest)
 
 lex' :: String -> [String]
