@@ -24,6 +24,9 @@ lex' (x : xs)
   | x `elem` numberCharacters =
       let (number, rest) = lexNumber (x : xs)
        in number : lex' rest
+  | take 4 (x : xs) == "true" = "true" : lex' (drop 3 xs)
+  | take 5 (x : xs) == "false" = "false" : lex' (drop 4 xs)
+  | take 4 (x : xs) == "null" = "null" : lex' (drop 3 xs)
   | x `elem` jsonWhitespace = lex' xs
   | x `elem` jsonSyntax = [x] : lex' xs
   | otherwise = error ("Unexpected character: " ++ [x])
@@ -32,4 +35,4 @@ main :: IO ()
 main = do
   print (lexString "\"foo\": []")
   print (lexNumber "123: []")
-  print (lex' "{\"foo\": [1, 2, {\"bar\": 2}]}")
+  print (lex' "{\"foo\": [1, true, {\"bar\": 2}],\"baz\": null}")
