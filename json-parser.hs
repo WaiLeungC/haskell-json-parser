@@ -5,7 +5,7 @@ jsonSyntax :: String
 jsonSyntax = ",:[]{}"
 
 numberCharacters :: String
-numberCharacters = [c | d <- ['0' .. '9'], c <- [d]] ++ ['-', 'e', '.']
+numberCharacters = [character | digit <- ['0' .. '9'], character <- [digit]] ++ ['-', 'e', '.']
 
 lexString :: String -> (String, String)
 lexString ('"' : xs) =
