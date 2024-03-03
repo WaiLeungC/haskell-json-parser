@@ -48,17 +48,30 @@ parseValue x
   | all (`elem` numberCharacters) x = JSONNumber (read x)
   | otherwise = JSONString x
 
-parseArray :: [String] -> ([JSONValue], [String])
-parseArray = undefined
+parseArray :: [String] -> JSONValue
+parseArray ("[" : xs) = JSONArray (parseElements xs)
+  where
+    parseElements :: [String] -> [JSONValue]
+    parseElements ("]" : xs) = []
+    parseElements ("," : xs) = parseElements xs
+    parseElements (x : xs) = parseValue x : parseElements xs
+parseArray _ = error "Invalid JSON array"
+
+parseObject :: [String] -> JSONValue
+parseObject = undefined
+
+parse :: [String] -> [JSONValue]
+parse = undefined
 
 main :: IO ()
 main = do
   print (lexString "\"foo\": []")
   print (lexNumber "123: []")
+
   let tokens = lex' "{\"foo\": [1, true, {\"bar\": 2}],\"baz\": null}"
   print tokens
 
   let jsonValue = JSONObject [("name", JSONString "John"), ("age", JSONNumber 20), ("isStudent", JSONBool True), ("hobbies", JSONArray [JSONString "Reading", JSONString "Coding"])]
   print jsonValue
 
-  print (parseArray tokens)
+  print (parseArray ["[", "1", ",", "true", ",", "example", "]"])
