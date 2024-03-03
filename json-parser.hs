@@ -5,7 +5,7 @@ jsonSyntax :: String
 jsonSyntax = ",:[]{}"
 
 numberCharacters :: String
-numberCharacters = [character | digit <- ['0' .. '9'], character <- [digit]] ++ ['-', 'e', '.']
+numberCharacters = ['0' .. '9'] ++ ['-', 'e', '.']
 
 lexString :: String -> (String, String)
 lexString ('"' : xs) =
@@ -39,6 +39,14 @@ data JSONValue
   | JSONArray [JSONValue]
   | JSONObject [(String, JSONValue)]
   deriving (Show, Eq)
+
+parseValue :: String -> JSONValue
+parseValue "true" = JSONBool True
+parseValue "false" = JSONBool False
+parseValue "null" = JSONNull
+parseValue x
+  | all (`elem` numberCharacters) x = JSONNumber (read x)
+  | otherwise = JSONString x
 
 parseArray :: [String] -> ([JSONValue], [String])
 parseArray = undefined
