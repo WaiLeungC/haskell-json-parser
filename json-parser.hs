@@ -58,7 +58,18 @@ parseArray ("[" : xs) = JSONArray (parseElements xs)
 parseArray _ = error "Invalid JSON array"
 
 parseObject :: [String] -> JSONValue
-parseObject = undefined
+parseObject ("{" : xs) = JSONObject (parsePairs xs)
+  where
+    parsePairs :: [String] -> [(String, JSONValue)]
+    parsePairs ("}" : _) = []
+    parsePairs ("," : xs) = parsePairs xs
+    parsePairs (x : ":" : y : xs) =
+      let value = case y of
+            "{" -> parseObject (y : xs)
+            "[" -> parseArray (y : xs)
+            _ -> parseValue y
+       in (x, value) : parsePairs xs
+parseObject _ = error "Invalid JSON object"
 
 parse :: [String] -> [JSONValue]
 parse = undefined
@@ -75,3 +86,5 @@ main = do
   print jsonValue
 
   print (parseArray ["[", "1", ",", "true", ",", "example", "]"])
+  print (parseObject ["{", "name", ":", "John", "}"])
+  print ["{", "name", ":", "John", ",", "hobbies", ":", "[", "Reading", ",", "Coding", "]", "}"]
