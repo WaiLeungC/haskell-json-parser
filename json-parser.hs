@@ -31,8 +31,26 @@ lex' (x : xs)
   | x `elem` jsonSyntax = [x] : lex' xs
   | otherwise = error ("Unexpected character: " ++ [x])
 
+data JSONValue
+  = JSONString String
+  | JSONNumber Double
+  | JSONBool Bool
+  | JSONNull
+  | JSONArray [JSONValue]
+  | JSONObject [(String, JSONValue)]
+  deriving (Show, Eq)
+
+parseArray :: [String] -> ([JSONValue], [String])
+parseArray = undefined
+
 main :: IO ()
 main = do
   print (lexString "\"foo\": []")
   print (lexNumber "123: []")
-  print (lex' "{\"foo\": [1, true, {\"bar\": 2}],\"baz\": null}")
+  let tokens = lex' "{\"foo\": [1, true, {\"bar\": 2}],\"baz\": null}"
+  print tokens
+
+  let jsonValue = JSONObject [("name", JSONString "John"), ("age", JSONNumber 20), ("isStudent", JSONBool True), ("hobbies", JSONArray [JSONString "Reading", JSONString "Coding"])]
+  print jsonValue
+
+  print (parseArray tokens)
