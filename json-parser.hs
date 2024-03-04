@@ -97,5 +97,8 @@ main = do
   print (parseObject ["{", "address", ":", "{", "street", ":", "Streetname", ",", "city", ":", "Cityname", "}", "}"])
   print (parse "{\"address\":{\"street\":\"Streetname\",\"city\":\"Cityname\"}}")
 
+  print (JSONObject [("foo", JSONArray [JSONObject [("bar", JSONNumber 2.0)]])])
   print (parse "{\"foo\":[{\"bar\":2}]}")
-  print (parse "{\"foo\": [1, true, {\"bar\": 2}],\"baz\": null}")
+
+  print (JSONObject [("foo", JSONArray [JSONNumber 1, JSONBool True, JSONObject [("bar", JSONNumber 2)]]), ("baz", JSONNull)])
+  print (parse "{\"foo\":[1,true,{\"bar\":2}],\"baz\":null}")
