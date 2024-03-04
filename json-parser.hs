@@ -68,7 +68,7 @@ parseObject ("{" : xs) = JSONObject (parsePairs xs)
             "{" -> parseObject (y : xs)
             "[" -> parseArray (y : xs)
             _ -> parseValue y
-       in (x, value) : parsePairs xs
+       in (x, value) : parsePairs (tail xs)
     parsePairs _ = []
 parseObject _ = error "Invalid JSON object"
 
