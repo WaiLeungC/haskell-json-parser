@@ -53,6 +53,7 @@ parseArray ("[" : xs) = JSONArray (parseElements xs)
   where
     parseElements :: [String] -> [JSONValue]
     parseElements ("]" : xs) = []
+    parseElements ("{" : xs) = [parseObject ("{" : xs)]
     parseElements ("," : xs) = parseElements xs
     parseElements (x : xs) = parseValue x : parseElements xs
 parseArray _ = error "Invalid JSON array"
@@ -73,7 +74,7 @@ parseObject ("{" : xs) = JSONObject (parsePairs xs)
 parseObject _ = error "Invalid JSON object"
 
 parse :: String -> JSONValue
-parse = undefined
+parse = parseObject . lex'
 
 main :: IO ()
 main = do
@@ -93,3 +94,9 @@ main = do
   print (parseObject ["{", "hobbies", ":", "[", "Reading", ",", "Coding", "]", "}"])
   print (parseObject ["{", "address", ":", "{", "street", ":", "Streetname", "}", "}"])
   print (parseObject ["{", "address", ":", "{", "street", ":", "Streetname", ",", "city", ":", "Cityname", "}", "}"])
+
+  print (parse "{\"hobbies\":[\"Reading\",\"Coding\"]}")
+  print (parse "{\"address\":{\"street\":\"Streetname\",\"city\":\"Cityname\"}}")
+
+  print (parse "{\"foo\":[{\"bar\":2}]}")
+  print (parse "{\"foo\": [1, true, {\"bar\": 2}],\"baz\": null}")
