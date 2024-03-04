@@ -69,6 +69,7 @@ parseObject ("{" : xs) = JSONObject (parsePairs xs)
             "[" -> parseArray (y : xs)
             _ -> parseValue y
        in (x, value) : parsePairs xs
+    parsePairs _ = []
 parseObject _ = error "Invalid JSON object"
 
 parse :: String -> JSONValue
@@ -86,7 +87,9 @@ main = do
   print jsonValue
 
   print (parseArray ["[", "1", ",", "true", ",", "example", "]"])
+  print (parseObject ["{", "hobby", ":", "Reading", "}"])
   print (parseObject ["{", "name", ":", "John", ",", "age", ":", "20", "}"])
-
-  print (parseObject ["{", "hobbies", ":", "[", "reading", "]", "}"])
-  print (parseObject ["{", "hobbies", ":", "[", "reading", ",", "coding", "]", "}"])
+  print (parseObject ["{", "hobbies", ":", "[", "Reading", "]", "}"])
+  print (parseObject ["{", "hobbies", ":", "[", "Reading", ",", "Coding", "]", "}"])
+  print (parseObject ["{", "address", ":", "{", "street", ":", "Streetname", "}", "}"])
+  print (parseObject ["{", "address", ":", "{", "street", ":", "Streetname", ",", "city", ":", "Cityname", "}", "}"])
