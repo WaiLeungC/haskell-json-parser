@@ -92,10 +92,9 @@ main = do
   print (parseObject ["{", "name", ":", "John", ",", "age", ":", "20", "}"])
   print (parseObject ["{", "hobbies", ":", "[", "Reading", "]", "}"])
   print (parseObject ["{", "hobbies", ":", "[", "Reading", ",", "Coding", "]", "}"])
+  print (parse "{\"hobbies\":[\"Reading\",\"Coding\"]}")
   print (parseObject ["{", "address", ":", "{", "street", ":", "Streetname", "}", "}"])
   print (parseObject ["{", "address", ":", "{", "street", ":", "Streetname", ",", "city", ":", "Cityname", "}", "}"])
-
-  print (parse "{\"hobbies\":[\"Reading\",\"Coding\"]}")
   print (parse "{\"address\":{\"street\":\"Streetname\",\"city\":\"Cityname\"}}")
 
   print (parse "{\"foo\":[{\"bar\":2}]}")
