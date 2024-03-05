@@ -69,7 +69,7 @@ parseObject ("{" : xs) = JSONObject (parsePairs xs)
             "{" -> parseObject (y : xs)
             "[" -> parseArray (y : xs)
             _ -> parseValue y
-       in (x, value) : parsePairs (tail xs)
+       in (x, value) : parsePairs (dropWhile (/= ",") xs)
     parsePairs _ = []
 parseObject _ = error "Invalid JSON object"
 
@@ -98,7 +98,12 @@ main = do
   print (parse "{\"address\":{\"street\":\"Streetname\",\"city\":\"Cityname\"}}")
 
   print (JSONObject [("foo", JSONArray [JSONObject [("bar", JSONNumber 2.0)]])])
+  print (parseObject ["{", "foo", ":", "[", "{", "bar", ":", "2", "}", "]", "}"])
   print (parse "{\"foo\":[{\"bar\":2}]}")
+
+  print (JSONObject [("foo", JSONArray [JSONObject [("bar", JSONNumber 2)]]), ("baz", JSONNull)])
+  print (parseObject ["{", "foo", ":", "[", "{", "bar", ":", "2", "}", "]", ",", "baz", ":", "null", "}"])
+  print (parse "{\"foo\":[{\"bar\":2}],\"baz\":null}")
 
   print (JSONObject [("foo", JSONArray [JSONNumber 1, JSONBool True, JSONObject [("bar", JSONNumber 2)]]), ("baz", JSONNull)])
   print (parse "{\"foo\":[1,true,{\"bar\":2}],\"baz\":null}")
