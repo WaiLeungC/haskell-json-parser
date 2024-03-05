@@ -62,7 +62,6 @@ parseObject :: [String] -> JSONValue
 parseObject ("{" : xs) = JSONObject (parsePairs xs)
   where
     parsePairs :: [String] -> [(String, JSONValue)]
-    parsePairs ("," : xs) = parsePairs xs
     parsePairs (x : ":" : y : xs) =
       let value = case y of
             "{" -> parseObject (y : xs)
