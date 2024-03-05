@@ -88,8 +88,8 @@ main = do
   print jsonValue
 
   print (parseArray ["[", "1", ",", "true", ",", "example", "]"])
-  print (parseObject ["{", "hobby", ":", "Reading", "}"])
-  print (parseObject ["{", "name", ":", "John", ",", "age", ":", "20", "}"])
+  print (parseObject ["{", "name", ":", "John", "}"])
+  print (parseObject ["{", "name", ":", "John", ",", "age", ":", "20", ",", "isStudent", ":", "true", "}"])
   print (parseObject ["{", "hobbies", ":", "[", "Reading", "]", "}"])
   print (parseObject ["{", "hobbies", ":", "[", "Reading", ",", "Coding", "]", "}"])
   print (parse "{\"hobbies\":[\"Reading\",\"Coding\"]}")
@@ -101,9 +101,16 @@ main = do
   print (parseObject ["{", "foo", ":", "[", "{", "bar", ":", "2", "}", "]", "}"])
   print (parse "{\"foo\":[{\"bar\":2}]}")
 
+  print "----------------------------------------------------"
+
   print (JSONObject [("foo", JSONArray [JSONObject [("bar", JSONNumber 2)]]), ("baz", JSONNull)])
   print (parseObject ["{", "foo", ":", "[", "{", "bar", ":", "2", "}", "]", ",", "baz", ":", "null", "}"])
   print (parse "{\"foo\":[{\"bar\":2}],\"baz\":null}")
 
   print (JSONObject [("foo", JSONArray [JSONNumber 1, JSONBool True, JSONObject [("bar", JSONNumber 2)]]), ("baz", JSONNull), ("foo2", JSONNumber 3)])
+  print (parseObject ["{", "foo", ":", "[", "1", ",", "true", ",", "{", "bar", ":", "2", "}", "]", ",", "baz", ":", "null", ",", "foo2", ":", "3", "}"])
   print (parse "{\"foo\":[1,true,{\"bar\":2}],\"baz\":null,\"foo2\":3}")
+
+  print (parse "{\"foo\":true,\"baz\":null, \"foo2\":3}")
+  print (parse "{\"foo\":[1,true],\"baz\":null, \"foo2\":3}")
+  print (parse "{\"foo\":[{\"foo3\":1},true],\"baz\":null, \"foo2\":3}")
