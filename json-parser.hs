@@ -62,14 +62,15 @@ parseObject :: [String] -> JSONValue
 parseObject ("{" : xs) = JSONObject (parsePairs xs)
   where
     parsePairs :: [String] -> [(String, JSONValue)]
-    parsePairs ("}" : xs) = []
     parsePairs ("," : xs) = parsePairs xs
     parsePairs (x : ":" : y : xs) =
       let value = case y of
             "{" -> parseObject (y : xs)
             "[" -> parseArray (y : xs)
             _ -> parseValue y
-       in (x, value) : parsePairs (dropWhile (/= ",") xs)
+       in case xs of
+            ("," : xs) -> (x, value) : parsePairs xs
+            _ -> [(x, value)]
     parsePairs _ = []
 parseObject _ = error "Invalid JSON object"
 
@@ -105,5 +106,5 @@ main = do
   print (parseObject ["{", "foo", ":", "[", "{", "bar", ":", "2", "}", "]", ",", "baz", ":", "null", "}"])
   print (parse "{\"foo\":[{\"bar\":2}],\"baz\":null}")
 
-  print (JSONObject [("foo", JSONArray [JSONNumber 1, JSONBool True, JSONObject [("bar", JSONNumber 2)]]), ("baz", JSONNull)])
-  print (parse "{\"foo\":[1,true,{\"bar\":2}],\"baz\":null}")
+  print (JSONObject [("foo", JSONArray [JSONNumber 1, JSONBool True, JSONObject [("bar", JSONNumber 2)]]), ("baz", JSONNull), ("foo2", JSONNumber 3)])
+  print (parse "{\"foo\":[1,true,{\"bar\":2}],\"baz\":null,\"foo2\":3}")
