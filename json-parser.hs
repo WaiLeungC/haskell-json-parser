@@ -62,15 +62,15 @@ parseObject :: [String] -> JSONValue
 parseObject ("{" : xs) = JSONObject (parsePairs xs)
   where
     parsePairs :: [String] -> [(String, JSONValue)]
-    parsePairs (x : ":" : y : xs) =
-      let value = case y of
-            "{" -> parseObject (y : xs)
-            "[" -> parseArray (y : xs)
-            _ -> parseValue y
-       in case xs of
-            ("," : xs) -> (x, value) : parsePairs xs
-            _ -> [(x, value)]
-    parsePairs _ = []
+    parsePairs (x : ":" : xs) =
+      case parseRest xs of
+        (value, "," : ys) -> (x, value) : parsePairs ys
+        (value, _) -> [(x, value)]
+
+    parseRest :: [String] -> (JSONValue, [String])
+    parseRest ("{" : xs) = let object = parseObject ("{" : xs) in (object, drop 1 (dropWhile (/= "}") xs))
+    parseRest ("[" : xs) = let array = parseArray ("[" : xs) in (array, drop 1 (dropWhile (/= "]") xs))
+    parseRest (x : xs) = (parseValue x, xs)
 parseObject _ = error "Invalid JSON object"
 
 parse :: String -> JSONValue
@@ -103,8 +103,13 @@ main = do
 
   print "----------------------------------------------------"
 
+  -- [[]] ...
+  print ((reverse . dropWhile (/= "]") . reverse) ["[", "bar", ",", "2", "]", ",", "baz", ":", "null", "}"])
+  -- [...], key : value xs
+  print (drop 1 (reverse (takeWhile (/= "]") (reverse ["[", "bar", ",", "2", "]", ",", "baz", ":", "null", "}"]))))
+
   print (parse "{\"foo\":[\"bar\", 2],\"baz\":null}")
-  
+
   print (JSONObject [("foo", JSONArray [JSONObject [("bar", JSONNumber 2)]]), ("baz", JSONNull)])
   print (parseObject ["{", "foo", ":", "[", "{", "bar", ":", "2", "}", "]", ",", "baz", ":", "null", "}"])
   print (parse "{\"foo\":[{\"bar\":2}],\"baz\":null}")
@@ -116,3 +121,6 @@ main = do
   print (parse "{\"foo\":true,\"baz\":null, \"foo2\":3}")
   print (parse "{\"foo\":[1,true],\"baz\":null, \"foo2\":3}")
   print (parse "{\"foo\":[{\"foo3\":1},true],\"baz\":null, \"foo2\":3}")
+
+  print (parseObject ["{", "parent", ":", "{", "child", ":", "{", "name", ":", "Child", "}", ",", "name", ":", "Parent", "}", "}"])
+  print (parseObject ["{", "\"parent\"", ":", "{", "\"name\"", ":", "\"Parent\"", ",", "\"child\"", ":", "{", "\"name\"", ":", "\"Child\"", ",", "\"grandchild\"", ":", "{", "\"name\"", ":", "\"Grandchild\"", ",", "\"age\"", ":", "5", "}", "\"key\"", ":", "\"value\""])
