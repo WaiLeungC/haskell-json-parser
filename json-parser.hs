@@ -103,6 +103,8 @@ main = do
 
   print "----------------------------------------------------"
 
+  print (parse "{\"foo\":[\"bar\", 2],\"baz\":null}")
+  
   print (JSONObject [("foo", JSONArray [JSONObject [("bar", JSONNumber 2)]]), ("baz", JSONNull)])
   print (parseObject ["{", "foo", ":", "[", "{", "bar", ":", "2", "}", "]", ",", "baz", ":", "null", "}"])
   print (parse "{\"foo\":[{\"bar\":2}],\"baz\":null}")
