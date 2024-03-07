@@ -126,4 +126,3 @@ main = do
   print (parse "{\"foo\":[{\"foo3\":1},true],\"baz\":null, \"foo2\":3}")
 
   print (parseObject ["{", "parent", ":", "{", "child", ":", "{", "name", ":", "Child", "}", ",", "name", ":", "Parent", "}", "}"])
-  print (parseObject ["{", "\"parent\"", ":", "{", "\"name\"", ":", "\"Parent\"", ",", "\"child\"", ":", "{", "\"name\"", ":", "\"Child\"", ",", "\"grandchild\"", ":", "{", "\"name\"", ":", "\"Grandchild\"", ",", "\"age\"", ":", "5", "}", "\"key\"", ":", "\"value\""])
