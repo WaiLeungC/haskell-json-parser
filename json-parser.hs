@@ -69,10 +69,9 @@ parseObject ("{" : xs) = JSONObject (parsePairs xs)
         (value, rest) -> [(x, value)]
 
     parseRest :: [String] -> (JSONValue, [String])
-    parseRest (x : xs)
-      | x == "{" = let object = parseObject (x : xs) in (object, drop 1 (dropWhile (/= "}") xs))
-      | x == "[" = let array = parseArray (x : xs) in (array, drop 1 (dropWhile (/= "]") xs))
-      | otherwise = (parseValue x, xs)
+    parseRest ("{" : xs) = let object = parseObject ("{" : xs) in (object, drop 1 (dropWhile (/= "}") xs))
+    parseRest ("[" : xs) = let array = parseArray ("[" : xs) in (array, drop 1 (dropWhile (/= "]") xs))
+    parseRest (x : xs) = (parseValue x, xs)
 parseObject _ = error "Invalid JSON object"
 
 parse :: String -> JSONValue
