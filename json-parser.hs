@@ -53,7 +53,7 @@ parseArray ("[" : xs) = JSONArray (parseElements xs)
   where
     parseElements :: [String] -> [JSONValue]
     parseElements ("]" : xs) = []
-    parseElements ("{" : xs) = [parseObject ("{" : xs)]
+    parseElements ("{" : xs) = parseObject ("{" : takeWhile (/= "}") xs) : parseElements (drop 1 (dropWhile (/= "}") xs))
     parseElements ("," : xs) = parseElements xs
     parseElements (x : xs) = parseValue x : parseElements xs
 parseArray _ = error "Invalid JSON array"
@@ -62,15 +62,18 @@ parseObject :: [String] -> JSONValue
 parseObject ("{" : xs) = JSONObject (parsePairs xs)
   where
     parsePairs :: [String] -> [(String, JSONValue)]
+    parsePairs ("}" : xs) = []
     parsePairs (x : ":" : xs) =
       case parseRest xs of
-        (value, "," : ys) -> (x, value) : parsePairs ys
-        (value, _) -> [(x, value)]
+        (value, "," : rest) -> (x, value) : parsePairs rest
+        (value, rest) -> (x, value) : parsePairs rest
+    parsePairs [] = []
 
     parseRest :: [String] -> (JSONValue, [String])
-    parseRest ("{" : xs) = let object = parseObject ("{" : xs) in (object, drop 1 (dropWhile (/= "}") xs))
-    parseRest ("[" : xs) = let array = parseArray ("[" : xs) in (array, drop 1 (dropWhile (/= "]") xs))
-    parseRest (x : xs) = (parseValue x, xs)
+    parseRest (x : xs)
+      | x == "{" = let object = parseObject (x : xs) in (object, drop 1 (dropWhile (/= "}") xs))
+      | x == "[" = let array = parseArray (x : xs) in (array, drop 1 (dropWhile (/= "]") xs))
+      | otherwise = (parseValue x, xs)
 parseObject _ = error "Invalid JSON object"
 
 parse :: String -> JSONValue
@@ -116,7 +119,7 @@ main = do
 
   print (JSONObject [("foo", JSONArray [JSONNumber 1, JSONBool True, JSONObject [("bar", JSONNumber 2)]]), ("baz", JSONNull), ("foo2", JSONNumber 3)])
   print (parseObject ["{", "foo", ":", "[", "1", ",", "true", ",", "{", "bar", ":", "2", "}", "]", ",", "baz", ":", "null", ",", "foo2", ":", "3", "}"])
-  print (parse "{\"foo\":[1,true,{\"bar\":2}],\"baz\":null,\"foo2\":3}")
+  print (parse "{\"foo\":[1,true,{\"bar\":2,\"bar2\":3},4,5],\"baz\":null,\"foo2\":3}")
 
   print (parse "{\"foo\":true,\"baz\":null, \"foo2\":3}")
   print (parse "{\"foo\":[1,true],\"baz\":null, \"foo2\":3}")
