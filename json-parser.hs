@@ -66,8 +66,7 @@ parseObject ("{" : xs) = JSONObject (parsePairs xs)
     parsePairs (x : ":" : xs) =
       case parseRest xs of
         (value, "," : rest) -> (x, value) : parsePairs rest
-        (value, rest) -> (x, value) : parsePairs rest
-    parsePairs [] = []
+        (value, rest) -> [(x, value)]
 
     parseRest :: [String] -> (JSONValue, [String])
     parseRest (x : xs)
