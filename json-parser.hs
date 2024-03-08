@@ -1,3 +1,8 @@
+main :: IO ()
+main = do
+  print (parse "{\"foo\":[1, {\"bar\":2},true],\"baz\":null}")
+  print (parse "{\"parent\":{\"child\":{\"name\":\"Martin\"},\"name\":\"John\"}}")
+
 jsonWhitespace :: String
 jsonWhitespace = " \t\b\n\r"
 
@@ -69,58 +74,14 @@ parseObject ("{" : xs) = JSONObject (parsePairs xs)
         (value, rest) -> [(x, value)]
 
     parsePairValue :: [String] -> (JSONValue, [String])
-    parsePairValue ("{" : xs) = let object = parseObject ("{" : xs) in (object, drop 1 (dropWhile (/= "}") xs))
-    parsePairValue ("[" : xs) = let array = parseArray ("[" : xs) in (array, drop 1 (dropWhile (/= "]") xs))
+    parsePairValue ("{" : xs) =
+      let object = parseObject ("{" : xs)
+       in (object, drop 1 (dropWhile (/= "}") xs))
+    parsePairValue ("[" : xs) =
+      let array = parseArray ("[" : xs)
+       in (array, drop 1 (dropWhile (/= "]") xs))
     parsePairValue (x : xs) = (parseValue x, xs)
 parseObject _ = error "Invalid JSON object"
 
 parse :: String -> JSONValue
 parse = parseObject . lex'
-
-main :: IO ()
-main = do
-  print (lexString "\"foo\": []")
-  print (lexNumber "123: []")
-
-  let tokens = lex' "{\"foo\": [1, true, {\"bar\": 2}],\"baz\": null}"
-  print tokens
-
-  let jsonValue = JSONObject [("name", JSONString "John"), ("age", JSONNumber 20), ("isStudent", JSONBool True), ("hobbies", JSONArray [JSONString "Reading", JSONString "Coding"])]
-  print jsonValue
-
-  print (parseArray ["[", "1", ",", "true", ",", "example", "]"])
-  print (parseObject ["{", "name", ":", "John", "}"])
-  print (parseObject ["{", "name", ":", "John", ",", "age", ":", "20", ",", "isStudent", ":", "true", "}"])
-  print (parseObject ["{", "hobbies", ":", "[", "Reading", "]", "}"])
-  print (parseObject ["{", "hobbies", ":", "[", "Reading", ",", "Coding", "]", "}"])
-  print (parse "{\"hobbies\":[\"Reading\",\"Coding\"]}")
-  print (parseObject ["{", "address", ":", "{", "street", ":", "Streetname", "}", "}"])
-  print (parseObject ["{", "address", ":", "{", "street", ":", "Streetname", ",", "city", ":", "Cityname", "}", "}"])
-  print (parse "{\"address\":{\"street\":\"Streetname\",\"city\":\"Cityname\"}}")
-
-  print (JSONObject [("foo", JSONArray [JSONObject [("bar", JSONNumber 2.0)]])])
-  print (parseObject ["{", "foo", ":", "[", "{", "bar", ":", "2", "}", "]", "}"])
-  print (parse "{\"foo\":[{\"bar\":2}]}")
-
-  print "----------------------------------------------------"
-
-  -- [[]] ...
-  print ((reverse . dropWhile (/= "]") . reverse) ["[", "bar", ",", "2", "]", ",", "baz", ":", "null", "}"])
-  -- [...], key : value xs
-  print (drop 1 (reverse (takeWhile (/= "]") (reverse ["[", "bar", ",", "2", "]", ",", "baz", ":", "null", "}"]))))
-
-  print (parse "{\"foo\":[\"bar\", 2],\"baz\":null}")
-
-  print (JSONObject [("foo", JSONArray [JSONObject [("bar", JSONNumber 2)]]), ("baz", JSONNull)])
-  print (parseObject ["{", "foo", ":", "[", "{", "bar", ":", "2", "}", "]", ",", "baz", ":", "null", "}"])
-  print (parse "{\"foo\":[{\"bar\":2}],\"baz\":null}")
-
-  print (JSONObject [("foo", JSONArray [JSONNumber 1, JSONBool True, JSONObject [("bar", JSONNumber 2)]]), ("baz", JSONNull), ("foo2", JSONNumber 3)])
-  print (parseObject ["{", "foo", ":", "[", "1", ",", "true", ",", "{", "bar", ":", "2", "}", "]", ",", "baz", ":", "null", ",", "foo2", ":", "3", "}"])
-  print (parse "{\"foo\":[1,true,{\"bar\":2,\"bar2\":3},4,5],\"baz\":null,\"foo2\":3}")
-
-  print (parse "{\"foo\":true,\"baz\":null, \"foo2\":3}")
-  print (parse "{\"foo\":[1,true],\"baz\":null, \"foo2\":3}")
-  print (parse "{\"foo\":[{\"foo3\":1},true],\"baz\":null, \"foo2\":3}")
-
-  print (parseObject ["{", "parent", ":", "{", "child", ":", "{", "name", ":", "Child", "}", ",", "name", ":", "Parent", "}", "}"])
